@@ -48,7 +48,7 @@ a {
 }
 
 .header h1 {
-  font-size: 3rem;
+  font-size: clamp(2.3rem, 3vw, 4.3rem);
 }
 
 #posts {
@@ -86,11 +86,15 @@ a {
 }
 
 #posts .post .text-inner-section h1 {
-  font-size: 1.8rem;
+  font-size: clamp(1.5rem, 1.5vw, 2.3rem);
 }
 
 #posts .post .text-inner-section p {
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 0.9vw, 1.5rem);
+}
+
+#posts .post .text-inner-section h3 {
+  font-size: clamp(1rem, 1.1vw, 1.7rem);
 }
 
 #post-spec {
@@ -99,18 +103,18 @@ a {
       -ms-flex-direction: column-reverse;
           flex-direction: column-reverse;
   width: 28rem;
-  min-height: 28rem;
-  height: -webkit-fit-content;
-  height: -moz-fit-content;
-  height: fit-content;
-  margin: 3.5rem;
+  height: Max(-webkit-fit-content, 10rem);
+  height: Max(-moz-fit-content, 10rem);
+  height: Max(fit-content, 10rem);
+  margin-block: clamp(2.8rem, 3vw, 3.5rem) clamp(0.5rem, 1vw, 1.5rem);
+  margin-inline: clamp(1rem, 2.8vw, 3.5rem);
   background-color: var(--current-card-clr);
   border: 2px solid var(--current-border-clr);
   border-radius: 10px;
 }
 
 #post-spec .image-inner-section {
-  margin: 1rem;
+  margin: clamp(0.6rem, 1vw, 1rem);
 }
 
 #post-spec .image-inner-section img {
@@ -118,7 +122,7 @@ a {
 }
 
 #post-spec .text-inner-section {
-  margin: 0 1rem 1rem 1rem;
+  margin: 0 clamp(0.6rem, 1vw, 1rem) clamp(0.6rem, 1vw, 1rem);
 }
 
 #post-spec .text-inner-section .image-counter {
@@ -186,8 +190,12 @@ a {
           align-items: center;
 }
 
-#preview .image-inner-section img {
+#preview .image-inner-section .image-slider .img-container img {
   width: 85%;
+}
+
+#preview .image-inner-section img {
+  height: 85%;
 }
 
 #preview .text-inner-section {

@@ -45,7 +45,7 @@ a {
     align-items: center;
 
     h1 {
-        font-size: 3rem;
+        font-size: clamp(2.3rem, 3vw, 4.3rem);
     }
 }
 
@@ -71,11 +71,15 @@ a {
 
         .text-inner-section {
             h1 {
-                font-size: 1.8rem;
+                font-size: clamp(1.5rem, 1.5vw, 2.3rem);
             }
-
+            
             p {
-                font-size: 1rem;
+                font-size: clamp(.9rem, .9vw, 1.5rem);
+            }
+            
+            h3 {
+                font-size: clamp(1rem, 1.1vw, 1.7rem);
             }
         }
     }
@@ -84,15 +88,15 @@ a {
 #post-spec {
     flex-direction: column-reverse;
     width: 28rem;
-    min-height: 28rem;
-    height: fit-content;
-    margin: 3.5rem;
+    height: Max(fit-content, 10rem);
+    margin-block: clamp(2.8rem, 3vw, 3.5rem) clamp(.5rem, 1vw, 1.5rem);
+    margin-inline: clamp(1rem, 2.8vw, 3.5rem);
     background-color: var(--current-card-clr);
     border: 2px solid var(--current-border-clr);
     border-radius: 10px;
 
     .image-inner-section {
-        margin: 1rem;
+        margin: clamp(.6rem, 1vw, 1rem);
 
         img {
             width: 100%;
@@ -100,7 +104,7 @@ a {
     }
 
     .text-inner-section {
-        margin: 0 1rem 1rem 1rem;
+        margin: 0 clamp(.6rem, 1vw, 1rem) clamp(.6rem, 1vw, 1rem);
 
         .image-counter {
             margin-top: .5rem;
@@ -145,11 +149,15 @@ a {
                 display: flex;
                 justify-content: center;
                 align-items: center;
+
+                img {
+                    width: 85%;
+                }
             }
         } 
 
         img {
-            width: 85%;
+            height: 85%;
         }
     }
 
