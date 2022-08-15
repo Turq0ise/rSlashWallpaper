@@ -1,102 +1,148 @@
-let after = ``
-let before = ``
-let apiLink = ``
-
-let prevBtn = `<i class="im im-angle-left-circle nav-btn" id="prev-btn" onclick="fetchRSlashWallpaper(false)"></i>`
-let nextBtn = `<i class="im im-angle-right-circle nav-btn" id="next-btn" onclick="fetchRSlashWallpaper(true)"></i>`
-let bothBtn
-
 const lazyCount = 5
-const postsCount = 30
+const postsCount = 50
+let after = ``
 
-async function fetchRSlashWallpaper(status) {
-    if(status == null) {
-        apiLink = `https://www.reddit.com/r/wallpaper.json?limit=${postsCount}&count=${postsCount}`
-        bothBtn = nextBtn
-    } else if(status) {
-        apiLink = `https://www.reddit.com/r/wallpaper.json?limit=${postsCount}&count=${postsCount}&after=${after}`
-        bothBtn = prevBtn + nextBtn
-    } else if(!status) {
-        apiLink = `https://www.reddit.com/r/wallpaper.json?limit=${postsCount}&count=${postsCount}&before=${before}`
-        bothBtn = prevBtn + nextBtn
+window.onload = () => {
+    const searchValue = window.location.search
+    if(searchValue === "") {
+        fetchRSlashWallpaper(`https://www.reddit.com/r/wallpaper/new.json?limit=${postsCount}&count=${postsCount}`)
+    } else {
+        let searchQuery = searchValue.split("?search=").pop().replace(/\+/g, "%20")
+        fetchRSlashWallpaper(`https://www.reddit.com/r/wallpaper/search.json?sort=new&q=${searchQuery}&limit=${postsCount}&count=${postsCount}&restrict_sr=true`)
+    }
+}
+
+window.onscroll = () => {
+    let scrollValue = 110
+    let getHeaderText = document.getElementsByClassName("header-text")
+
+    if(document.body.scrollTop > scrollValue || document.documentElement.scrollTop > scrollValue) {
+        for(let i = 0; i < getHeaderText.length; i++) {
+            getHeaderText[i].setAttribute("style", "font-size:calc(clamp(1.8rem, 2.2vw, 3.8rem) - 2px)")
+        }
+    } else {
+        for(let i = 0; i < getHeaderText.length; i++) {
+            getHeaderText[i].removeAttribute("style")
+        }
+    }
+}
+
+let getHeaderSection = document.getElementById("header")
+let getPostsSection = document.getElementById("posts")
+let borderValue = 2
+
+async function fetchRSlashWallpaper(apiLink, status) {
+    let spaceCorrectionValue = `${getHeaderSection.clientHeight + borderValue}px`
+    getPostsSection.style.paddingTop = spaceCorrectionValue
+
+    if(status) {
+        document.getElementById("btn-nav-section").remove()
     }
 
     const fetchData = await fetch(apiLink)
     const jsonData = await fetchData.json()
     after = await jsonData.data.after
-    before = await jsonData.data.before
 
-    window.scrollTo(0, 0);
-    
-    if(document.getElementById("posts")) {
-        document.getElementById("posts").remove()
-        document.getElementById("btn-nav-section").remove()
-    }
-
-    let divPosts = document.createElement("div")
-    divPosts.setAttribute("id", "posts")
-    document.body.appendChild(divPosts)
-    
     let i = 0
     jsonData.data.children.forEach(posts => {
-        let imgUrl = posts.data.url
+        let mainData = posts.data
+        let imgUrl = mainData.url
         let imgStr
+        let crosspostKey = mainData.crosspost_parent_list
 
-        if(imgUrl == `https://www.reddit.com/gallery/${posts.data.id}`) { 
-            let galleryUrl = posts.data.permalink.slice(0, -1)
+        if(crosspostKey !== undefined) {
+            mainData = crosspostKey[0]
+        }
+
+        if(imgUrl == `https://www.reddit.com/gallery/${mainData.id}`) { 
+            let galleryUrl = mainData.permalink.slice(0, -1)
 
             fetch(`https://www.reddit.com/${galleryUrl}.json`)
             .then(response => response.json())
             .then(object => {
                 const path = object[0].data.children[0].data.media_metadata
-                imgStr = ``
+                let imgStr = ''
+                let firstImg
                 let imgSliderCount = 0
 
+
                 Object.entries(path).forEach(images => {
-                    if (imgSliderCount == 0) {
-                        imgStr += `<img id="active-img" src="https://i.redd.it/${images[0]}.${images[1].m.slice(6)}"></img>`;
-                    } else if (i > lazyCount) {
-                        imgStr += `<img id="" loading="lazy" src="https://i.redd.it/${images[0]}.${images[1].m.slice(6)}"></img>`;
+                    let imgSrc = `https://i.redd.it/${images[0]}.${images[1].m.slice(6)}`
+                    if (imgSliderCount === 0) {
+                        imgStr += `${imgSrc},`
+                        firstImg = imgSrc
+                    } else if(imgSliderCount === Object.entries(path).length - 1) {
+                        imgStr += `${imgSrc}`
                     } else {
-                        imgStr += `<img id="" src="https://i.redd.it/${images[0]}.${images[1].m.slice(6)}"></img>`;
+                        imgStr += `${imgSrc},`
                     }
 
                     imgSliderCount++
                 })
 
-                document.getElementById("posts").innerHTML += `<div class="post" id="post-spec" onclick="imagePreview(this, true, event)"><div class="image-inner-section"><div class="image-slider"><i class="im im-angle-left" onclick="imageSlider(this, false)"></i><div class="img-container">${imgStr}</div><i class="im im-angle-right" onclick="imageSlider(this, true)"></i></div></div><div class="text-inner-section"><div class="container"><div class="left"><h1><a href="https://www.reddit.com${posts.data.permalink}" target="_blank">${posts.data.title}</a></h1><p>Posted by <a href="https://www.reddit.com/u/${posts.data.author}" target="_blank">u/${posts.data.author}</a></p><h3 class="image-counter">1/${imgSliderCount}</h3></div><i class="im im-x-mark" onclick=""></i></div></div></div>`
+                getPostsSection.innerHTML += `<div class="post" onclick="imagePreview('${firstImg}', '${imgStr}', this)"><div class="image-inner-section"><img loading="lazy" src="${firstImg}"></img></div><div class="text-inner-section"><h1><a href="https://www.reddit.com${mainData.permalink}" target="_blank">${mainData.title}</a></h1><p>Posted by <a href="https://www.reddit.com/u/${mainData.author}" target="_blank">u/${mainData.author}</a></p><h3 class="image-counter">1/${imgSliderCount}</h3></div></div>`
             })
         } else {
+            let imgSrc = mainData.preview.images[0].resolutions
+
             if(i > lazyCount) {
-                imgStr = `<img loading="lazy" src="${posts.data.url}"></img>`
+                imgStr = `<img loading="lazy" src="${imgSrc[imgSrc.length - 1].url}"></img>`
             } else {
-                imgStr = `<img src="${posts.data.url}"></img>`
+                imgStr = `<img src="${imgSrc[imgSrc.length - 1].url}"></img>`
             }
 
-            document.getElementById("posts").innerHTML += `<div class="post" id="post-spec" onclick="imagePreview(this, true, event)"><div class="image-inner-section">${imgStr}</div><div class="text-inner-section"><div class="container"><div class="left"><h1><a href="https://www.reddit.com${posts.data.permalink}" target="_blank">${posts.data.title}</a></h1><p>Posted by <a href="https://www.reddit.com/u/${posts.data.author}" target="_blank">u/${posts.data.author}</a></p><h3 class="image-counter">1/1</h3></div><i class="im im-x-mark" onclick=""></i></div></div></div>`
+            getPostsSection.innerHTML += `<div class="post" onclick="imagePreview('${mainData.url}', null, this)"><div class="image-inner-section">${imgStr}</div><div class="text-inner-section"><h1><a href="https://www.reddit.com${mainData.permalink}" target="_blank">${mainData.title}</a></h1><p>Posted by <a href="https://www.reddit.com/u/${mainData.author}" target="_blank">u/${mainData.author}</a></p><h3 class="image-counter">1/1</h3></div></div>`
         }
         i++
     })
 
-    let divNav = document.createElement("div")
-    divNav.setAttribute("id", "btn-nav-section")
-    document.body.appendChild(divNav)
-    divNav.innerHTML += bothBtn
+    if(after !== null) {
+        let showMoreBtn = `<button id="show-more" onclick="fetchRSlashWallpaper('${apiLink}&after=${after}', true)">Show More</button>`
+    
+        let divNav = document.createElement("div")
+        divNav.setAttribute("id", "btn-nav-section")
+        document.body.appendChild(divNav)
+        divNav.innerHTML += showMoreBtn
+    }
+
 }
 
-function imagePreview(elem, status, event) {
-    if(status) {
-        let xMarkStr = elem.children[1].children[0].children[1].attributes["onclick"]
-        elem.id = "preview"
-        xMarkStr.nodeValue = "imagePreview(this, false, event)"
-        elem.attributes["onclick"].nodeValue = ""
-    } else if(!status) {
-        let parentNodeStr = elem.parentNode.parentNode.parentNode
-        parentNodeStr.id = "post-spec"
-        elem.attributes["onclick"].nodeValue = ""
-        parentNodeStr.attributes["onclick"].nodeValue = "imagePreview(this, true, event)"
+function imagePreview(src, slideStr, elem) {
+    let getImagePreview = document.getElementById(src)
+    let getActiveImage = document.getElementById("active-img")
+
+    if(elem === null) {
+        getImagePreview.style.display = "none"
+        document.body.style.overflow = "auto"
+        getActiveImage.removeAttribute("id")
+    } else if(elem != null) {
+        if(getImagePreview !== null) {
+            getImagePreview.style.display = "flex"
+            document.body.style.overflow = "hidden"   
+            getImagePreview.children[1].children[0].children[1].children[0].setAttribute("id", "active-img")
+        } else if(getImagePreview === null) {
+            if(slideStr === null) {
+                elem.insertAdjacentHTML("afterend", `<div class="image-preview" id="${src}"><div class="text-inner-section"><div class="container"><div class="info"><h1>${elem.children[1].children[0].children[0].text}</h1><p>Posted by: ${elem.children[1].children[1].children[0].text}</p></div><i class="im im-x-mark" onclick="imagePreview('${src}', null, null)"></i></div></div><div class="image-inner-section"><img loading="lazy" src="${src}"></img></div></div>`)
+            } else if(slideStr !== null) {
+                let imgSliderCount = 0
+                let imgStr = ``
+
+                slideStr.split(",").forEach(imgSrc => {
+                    if (imgSliderCount == 0) {
+                        imgStr += `<img id="active-img" loading="lazy" src="${imgSrc}"></img>`
+                    } else {
+                        imgStr += `<img id="" loading="lazy" src="${imgSrc}"></img>`
+                    }
+
+                    imgSliderCount++
+                })
+
+                elem.insertAdjacentHTML("afterend", 
+                `<div class="image-preview" id="${src}"><div class="text-inner-section"><div class="container"><div class="info"><h1>${elem.children[1].children[0].children[0].text}</h1><p>Posted by: ${elem.children[1].children[1].children[0].text}</p></div><i class="im im-x-mark" onclick="imagePreview('${src}', null, null)"></i></div></div><div class="image-inner-section"><div class="image-slider"><i class="fa-solid fa-angle-left" onclick="imageSlider(this, false)"></i><div class="img-container">${imgStr}</div><i class="fa-solid fa-angle-right" onclick="imageSlider(this, true)"></i></div></div></div>`)
+            }
+            document.body.style.overflow = "hidden"   
+        }
     }
-    event.stopPropagation()
 }
 
 let activeImgCount = 0
@@ -121,14 +167,18 @@ function imageSlider(elem, status) {
     }
 }
 
-function colorThemeSwitcher(elem, status) {
+let status = true
+function colorThemeSwitcher() {
     if(status) {
         document.documentElement.style.cssText = "--current-body-clr: var(--body-clr-l);--current-card-clr: var(--card-clr-l);--current-semi-clr: var(--semi-clr-l);--current-border-clr: var(--border-clr-l);--current-font-clr: var(--font-clr-d);";
-        elem.children[0].style.fill = "rgb(0,0,0)"
-        elem.attributes["onclick"].nodeValue = "colorThemeSwitcher(this, false)"
+        status = false
     } else if(!status) {
         document.documentElement.style.cssText = "--current-body-clr: var(--body-clr-d);--current-card-clr: var(--card-clr-d);--current-semi-clr: var(--semi-clr-d);--current-border-clr: var(--border-clr-d);--current-font-clr: var(--font-clr-l);";
-        elem.children[0].style.fill = "rgb(255,255,255)"
-        elem.attributes["onclick"].nodeValue = "colorThemeSwitcher(this, true)"
+        status = true
     }
 }
+
+//Imgur tests
+// const test1 = fetch("https://imgur.com/a/vYvCqAf")
+// const test2 = test1.json()
+// console.log(test2)

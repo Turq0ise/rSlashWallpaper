@@ -1,0 +1,19 @@
+rSlashWallpaper Website V2 Dev Log (dd/mm/yyyy format):
+
+24/07/2022:
+Better site performance by using low res versions for the thumbnail while using the full res for the preview and sorting the posts by "new" instead of "hot". Only downside is galleries does not work for now. Blocking Imgur posts not yet started and global image size responsiveness not yet working.
+
+25/07/2022:
+Galleries are now working but their thumbnail still uses the full res and global image size responsiveness works with landscape sizes but I can't test portrait sizes because there are currently no posts. Number of posts have been increased to 50 and clicking "rSlashWallpaper" on the header will redirect you to the first page. Improving the navigation and pagination will be my next priority while implementing a search function and blocking Imgur posts would be later down the line.
+
+26/07/2022:
+Changed the header into a more proper navigation bar in preparation for a search bar in the future. Changed the pagination to a show more button while maintaining the previous posts instead of the previous and next arrow buttons. Changed icon provider from iconmonstr's iconic font to fontawesome's free kit. Removed the onclick redirect function on "rSlashWallpaper" which is to be replaced by a back to top button in the future. Blocking Imgur posts would not be an option because of the planned search function but, a possible alternative is to use the reddit post thumbnail for the full preview but, this would lead to a lower resolution than the original.
+
+27/07/2022:
+Crossposts now work in this V2 implementaion and imagePreview having two active images is now fixed but galleries will now default to the first image after closing instead of picking up where you left off. Researching about Imgur and Cross-Origin I've found that some Imgur posts already work while some do not, and an additional fetch request might fix it.
+
+29/07/2022:
+Search now works and a download button is being tested
+
+31/07/2022:
+Scrapped the download button and fixed the show more button, removed the iconmonstr link tag and added the defer attribute to script tags, further testing required to see if anything breaks after these changes.
