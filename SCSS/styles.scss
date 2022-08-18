@@ -83,6 +83,31 @@ a {
     }
 }
 
+#modal {
+    color: var(--current-font-clr);
+    background-color: var(--current-card-clr);
+    border: 2px solid var(--current-border-clr);
+    border-radius: 10px;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-51%);
+    font-size: 1.5rem;
+
+    .container{
+        display: flex;
+
+        #close-modal {
+            font-size: 2rem;
+        }
+    }
+    
+}
+
+#modal::backdrop {
+    background-color: black;
+    opacity: 0.4;
+}
+
 #posts {
     display: flex;
     flex-flow: row wrap;
@@ -141,6 +166,11 @@ a {
     z-index: 9;
     background-color: var(--current-semi-clr);
     color: var(--font-clr-l);
+    
+    i {
+        cursor: pointer;
+        font-size: 3rem;
+    }
 
     .text-inner-section {
         width: 100%;
@@ -172,10 +202,6 @@ a {
             width: 100%;
             padding: 0 2rem;
 
-            i {
-                cursor: pointer;
-                font-size: 3rem;
-            }
             
             .img-container {
                 display: flex;

@@ -2,6 +2,12 @@ const lazyCount = 5
 const postsCount = 50
 let after = ``
 
+let getModal = document.getElementById("modal")
+getModal.showModal()
+document.getElementById("close-modal").addEventListener("click", () => {
+    getModal.close()
+})
+
 window.onload = () => {
     const searchValue = window.location.search
     if(searchValue === "") {
@@ -49,6 +55,11 @@ async function fetchRSlashWallpaper(apiLink, status) {
         let imgUrl = mainData.url
         let imgStr
         let crosspostKey = mainData.crosspost_parent_list
+        
+        dateObj = new Date(mainData.created_utc * 1000)
+        utcString = dateObj.toUTCString()
+
+        console.log(utcString)
 
         if(crosspostKey !== undefined) {
             mainData = crosspostKey[0]
@@ -122,7 +133,7 @@ function imagePreview(src, slideStr, elem) {
             getImagePreview.children[1].children[0].children[1].children[0].setAttribute("id", "active-img")
         } else if(getImagePreview === null) {
             if(slideStr === null) {
-                elem.insertAdjacentHTML("afterend", `<div class="image-preview" id="${src}"><div class="text-inner-section"><div class="container"><div class="info"><h1>${elem.children[1].children[0].children[0].text}</h1><p>Posted by: ${elem.children[1].children[1].children[0].text}</p></div><i class="im im-x-mark" onclick="imagePreview('${src}', null, null)"></i></div></div><div class="image-inner-section"><img loading="lazy" src="${src}"></img></div></div>`)
+                elem.insertAdjacentHTML("afterend", `<div class="image-preview" id="${src}"><div class="text-inner-section"><div class="container"><div class="info"><h1>${elem.children[1].children[0].children[0].text}</h1><p>Posted by: ${elem.children[1].children[1].children[0].text}</p></div><i class="fa-solid fa-xmark" onclick="imagePreview('${src}', null, null)"></i></div></div><div class="image-inner-section"><img loading="lazy" src="${src}"></img></div></div>`)
             } else if(slideStr !== null) {
                 let imgSliderCount = 0
                 let imgStr = ``
@@ -138,7 +149,7 @@ function imagePreview(src, slideStr, elem) {
                 })
 
                 elem.insertAdjacentHTML("afterend", 
-                `<div class="image-preview" id="${src}"><div class="text-inner-section"><div class="container"><div class="info"><h1>${elem.children[1].children[0].children[0].text}</h1><p>Posted by: ${elem.children[1].children[1].children[0].text}</p></div><i class="im im-x-mark" onclick="imagePreview('${src}', null, null)"></i></div></div><div class="image-inner-section"><div class="image-slider"><i class="fa-solid fa-angle-left" onclick="imageSlider(this, false)"></i><div class="img-container">${imgStr}</div><i class="fa-solid fa-angle-right" onclick="imageSlider(this, true)"></i></div></div></div>`)
+                `<div class="image-preview" id="${src}"><div class="text-inner-section"><div class="container"><div class="info"><h1>${elem.children[1].children[0].children[0].text}</h1><p>Posted by: ${elem.children[1].children[1].children[0].text}</p></div><i class="fa-solid fa-xmark" onclick="imagePreview('${src}', null, null)"></i></div></div><div class="image-inner-section"><div class="image-slider"><i class="fa-solid fa-angle-left" onclick="imageSlider(this, false)"></i><div class="img-container">${imgStr}</div><i class="fa-solid fa-angle-right" onclick="imageSlider(this, true)"></i></div></div></div>`)
             }
             document.body.style.overflow = "hidden"   
         }
@@ -177,8 +188,3 @@ function colorThemeSwitcher() {
         status = true
     }
 }
-
-//Imgur tests
-// const test1 = fetch("https://imgur.com/a/vYvCqAf")
-// const test2 = test1.json()
-// console.log(test2)
