@@ -55,11 +55,6 @@ async function fetchRSlashWallpaper(apiLink, status) {
         let imgUrl = mainData.url
         let imgStr
         let crosspostKey = mainData.crosspost_parent_list
-        
-        dateObj = new Date(mainData.created_utc * 1000)
-        utcString = dateObj.toUTCString()
-
-        console.log(utcString)
 
         if(crosspostKey !== undefined) {
             mainData = crosspostKey[0]
