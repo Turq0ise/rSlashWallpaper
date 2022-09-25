@@ -88,6 +88,8 @@ async function fetchRSlashWallpaper(apiLink, status) {
 
                 getPostsSection.innerHTML += `<div class="post" onclick="imagePreview('${firstImg}', '${imgStr}', this)"><div class="image-inner-section"><img loading="lazy" src="${firstImg}"></img></div><div class="text-inner-section"><h1><a href="https://www.reddit.com${mainData.permalink}" target="_blank">${mainData.title}</a></h1><p>Posted by <a href="https://www.reddit.com/u/${mainData.author}" target="_blank">u/${mainData.author}</a></p><h3 class="image-counter">1/${imgSliderCount}</h3></div></div>`
             })
+        } else if(mainData.post_hint !== "image") {
+            return
         } else {
             let imgSrc = mainData.preview.images[0].resolutions
 
